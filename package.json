@@ -1,23 +1,28 @@
 {
-  "name": "nuxt-business-portfolio-template",
-  "description": "Production-ready Nuxt 4 business portfolio website starter template with SSR, Tailwind CSS, and TypeScript.",
+  "name": "nitara-special-school",
+  "description": "One-page website for Nitara Special School & Child Development Center, Rohini, New Delhi.",
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "nuxt build",
     "dev": "nuxt dev",
+    "build": "nuxt build",
+    "preview": "node .output/server/index.mjs",
     "generate": "nuxt generate",
-    "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "typecheck": "nuxt typecheck"
   },
   "dependencies": {
+    "@nuxt/fonts": "^0.14.0",
     "@nuxt/icon": "^2.2.1",
     "@nuxtjs/sitemap": "^7.6.0",
+    "motion-v": "^2.5.1",
     "nuxt": "^4.3.1",
     "vue": "^3.5.28",
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
+    "@iconify-json/mdi": "^1.2.3",
+    "@iconify-json/ph": "^1.2.2",
     "@nuxtjs/tailwindcss": "^6.13.2"
   }
 }

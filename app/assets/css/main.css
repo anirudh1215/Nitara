@@ -3,81 +3,142 @@
 @tailwind utilities;
 
 /*
- * CSS Custom Properties
- * ---------------------
- * These are the FALLBACK defaults. At runtime, useTheme() injects
- * the actual values from siteConfig.theme via useHead().
- * You can reference these anywhere with var(--color-primary), etc.
- *
- * Tailwind usage example:
- *   bg-[var(--color-primary)]
- *   text-[var(--color-text)]
- *   rounded-[var(--radius)]
+ * Nitara design tokens
+ * --------------------
+ * Saturated brand colours come straight from the logo; the pastel tints
+ * are desaturated versions of those same hues, used for section
+ * backgrounds so the page stays warm and soft rather than corporate.
  */
 :root {
-  --color-primary: #2563eb;
-  --color-secondary: #475569;
-  --color-accent: #f59e0b;
-  --color-bg: #ffffff;
-  --color-text: #0f172a;
-  --color-text-muted: #64748b;
-  --radius: 0.75rem;
-  --font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+  /* Logo palette */
+  --brand-blue: #1c4e9d;
+  --brand-orange: #f47920;
+  --brand-green: #3fa535;
+  --brand-pink: #e8368f;
+  --brand-yellow: #fdb913;
+  --brand-purple: #7b3f98;
+
+  /* Pastel surfaces */
+  --cream: #fff8f0;
+  --blush: #ffefe6;
+  --sky: #eaf3fd;
+  --mint: #eaf7e9;
+  --lilac: #f3edf9;
+  --butter: #fff6dc;
+
+  /* Ink */
+  --ink: #16263f;
+  --ink-muted: #5b6b84;
+
+  --radius: 1.75rem;
 }
 
-/* ─── Base Layer ─── */
 @layer base {
   html {
     scroll-behavior: smooth;
+    /* Sticky header is ~5rem; keep anchor targets clear of it */
+    scroll-padding-top: 6rem;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   body {
-    @apply font-sans;
-    background-color: var(--color-bg);
-    color: var(--color-text);
+    @apply bg-cream font-sans text-ink antialiased;
   }
 
   h1,
   h2,
   h3,
-  h4,
-  h5,
-  h6 {
-    @apply font-bold tracking-tight;
+  h4 {
+    @apply font-display font-bold tracking-tight;
+  }
+
+  /* Clear, high-contrast focus ring — this site is used by families who
+     may be navigating by keyboard or switch device. */
+  :focus-visible {
+    outline: 3px solid var(--brand-orange);
+    outline-offset: 3px;
+    border-radius: 6px;
   }
 }
 
-/* ─── Component Layer ─── */
 @layer components {
-  /* Fade-in-up animation for scroll reveals */
-  .animate-fade-in-up {
-    animation: fadeInUp 0.6s ease-out forwards;
+  /* Multi-colour rule echoing the logo's Learn • Grow • Empower */
+  .brand-rule {
+    height: 6px;
+    border-radius: 999px;
+    background: linear-gradient(
+      90deg,
+      var(--brand-blue) 0 25%,
+      var(--brand-green) 25% 50%,
+      var(--brand-pink) 50% 75%,
+      var(--brand-orange) 75% 100%
+    );
   }
 
-  @keyframes fadeInUp {
+  /*
+   * No edge fade on the marquee.
+   * A gradient fade (whether an overlay element or a mask) makes the text at
+   * both ends semi-transparent over the band colour, dropping contrast to
+   * about 1.8:1. On a site read by families with visual impairments that is
+   * not a worthwhile trade for a decorative flourish, so the strip simply
+   * clips at the viewport edge instead.
+   */
+
+  /* Seamless marquee: the track holds two identical copies of the content
+     and slides exactly one copy's width, so the loop has no visible seam. */
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee-scroll var(--marquee-duration, 32s) linear infinite;
+  }
+
+  .marquee:hover .marquee-track,
+  .marquee:focus-within .marquee-track {
+    animation-play-state: paused;
+  }
+
+  @keyframes marquee-scroll {
     from {
-      opacity: 0;
-      transform: translateY(24px);
+      transform: translate3d(0, 0, 0);
     }
     to {
-      opacity: 1;
-      transform: translateY(0);
+      transform: translate3d(-50%, 0, 0);
     }
   }
+}
 
-  /* Initially hidden for scroll animation */
-  .scroll-hidden {
-    opacity: 0;
-    transform: translateY(24px);
-    transition:
-      opacity 0.6s ease-out,
-      transform 0.6s ease-out;
+/*
+ * Respect prefers-reduced-motion.
+ * Components also check this in JS via useReducedMotion() and skip their
+ * entrance animations; this block catches the pure-CSS motion.
+ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
 
-  .scroll-visible {
-    opacity: 1;
-    transform: translateY(0);
+  .marquee-track {
+    animation: none;
+    transform: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  /*
+   * Motion writes opacity/transform as inline styles, which a normal rule
+   * cannot override — hence !important. This guarantees every revealed
+   * element sits at its resting state even if JS has not run yet.
+   */
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
   }
 }

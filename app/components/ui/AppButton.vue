@@ -1,60 +1,80 @@
 <script setup lang="ts">
 /**
- * AppButton — Reusable button / NuxtLink component.
- * Renders as <NuxtLink> when `to` is provided, otherwise a <button>.
+ * AppButton — button / internal link / external anchor, with a shared
+ * lift-and-scale hover that matches the rest of the page's motion.
+ *
+ * Renders <NuxtLink> for `to`, <a> for `href`, otherwise <button>.
  */
+import { snapSpring } from "~/utils/motion";
 
 interface Props {
-  /** Route path — renders as NuxtLink when set */
+  /** Internal route or in-page anchor */
   to?: string;
-  /** Visual variant */
-  variant?: "primary" | "outline" | "ghost";
-  /** Size preset */
+  /** External URL (tel:, mailto:, https:) */
+  href?: string;
+  variant?: "primary" | "accent" | "outline" | "white" | "ghost";
   size?: "sm" | "md" | "lg";
-  /** HTML button type (ignored when `to` is set) */
   type?: "button" | "submit" | "reset";
-  /** Disabled state */
   disabled?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  variant: "primary",
+  variant: "accent",
   size: "md",
   type: "button",
   disabled: false,
 });
 
-const baseClasses =
-  "inline-flex items-center justify-center font-semibold rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2";
+const reduced = usePrefersReducedMotion();
 
-const variantClasses: Record<string, string> = {
-  primary:
-    "bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800 shadow-sm hover:shadow-md",
+const base =
+  "inline-flex items-center justify-center gap-2 rounded-full font-bold text-center transition-colors duration-200 disabled:opacity-50 disabled:pointer-events-none";
+
+const variants: Record<string, string> = {
+  primary: "bg-primary-600 text-white hover:bg-primary-700 shadow-soft",
+  // Dark ink on the vivid logo orange: white on #f47920 is only 2.76:1,
+  // ink is 5.50:1, and the brand colour stays exactly as drawn.
+  accent: "bg-accent-500 text-ink hover:bg-accent-400 active:bg-accent-600 shadow-soft",
   outline:
-    "border-2 border-primary-600 text-primary-600 hover:bg-primary-50 active:bg-primary-100",
-  ghost:
-    "text-primary-600 hover:bg-primary-50 active:bg-primary-100",
+    "border-2 border-primary-600 text-primary-700 hover:bg-primary-50 bg-transparent",
+  white: "bg-white text-primary-700 hover:bg-primary-50 shadow-soft",
+  ghost: "text-primary-700 hover:bg-primary-50",
 };
 
-const sizeClasses: Record<string, string> = {
-  sm: "px-4 py-2 text-sm",
-  md: "px-6 py-2.5 text-base",
-  lg: "px-8 py-3 text-lg",
+const sizes: Record<string, string> = {
+  sm: "px-5 py-2.5 text-sm",
+  md: "px-6 py-3 text-base",
+  lg: "px-8 py-4 text-lg",
 };
 
-const classes = computed(() => [
-  baseClasses,
-  variantClasses[props.variant],
-  sizeClasses[props.size],
-  { "opacity-50 cursor-not-allowed pointer-events-none": props.disabled },
-]);
+const classes = computed(() => [base, variants[props.variant], sizes[props.size]]);
+
+/** Which element Motion should render */
+const tag = computed(() => {
+  if (props.to) return resolveComponent("NuxtLink");
+  if (props.href) return "a";
+  return "button";
+});
+
+// Always the same shape — reduced motion just means "no displacement".
+const hover = computed(() =>
+  reduced.value ? { y: 0, scale: 1 } : { y: -2, scale: 1.03 }
+);
+const press = computed(() => (reduced.value ? { scale: 1 } : { scale: 0.97 }));
 </script>
 
 <template>
-  <NuxtLink v-if="to" :to="to" :class="classes">
+  <Motion
+    :as="tag"
+    :to="to"
+    :href="href"
+    :type="to || href ? undefined : type"
+    :disabled="to || href ? undefined : disabled"
+    :class="classes"
+    :while-hover="hover"
+    :while-press="press"
+    :transition="snapSpring"
+  >
     <slot />
-  </NuxtLink>
-  <button v-else :type="type" :disabled="disabled" :class="classes">
-    <slot />
-  </button>
+  </Motion>
 </template>

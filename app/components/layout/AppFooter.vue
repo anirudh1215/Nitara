@@ -1,134 +1,112 @@
 <script setup lang="ts">
 /**
- * AppFooter — Multi-column footer with nav, contact info, and social links.
+ * AppFooter — link columns, contact details, social icons and the
+ * parent-organisation line from the logo.
  */
-const site = useSite();
+import { site, footerColumns } from "~~/content";
 
-const currentYear = new Date().getFullYear();
+const year = new Date().getFullYear();
 
-const legalLinks = [
-    { label: "Privacy Policy", to: "/privacy-policy" },
-    { label: "Terms & Conditions", to: "/terms" },
-];
+const socials = computed(() =>
+  [
+    { key: "facebook", url: site.social.facebook, icon: "mdi:facebook", label: "Facebook" },
+    { key: "instagram", url: site.social.instagram, icon: "mdi:instagram", label: "Instagram" },
+    { key: "youtube", url: site.social.youtube, icon: "mdi:youtube", label: "YouTube" },
+    { key: "whatsapp", url: site.whatsapp, icon: "mdi:whatsapp", label: "WhatsApp" },
+  ].filter((s) => !!s.url)
+);
 </script>
 
 <template>
-    <footer class="bg-secondary-900 text-secondary-300">
-        <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-            <div class="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
-                <!-- Brand Column -->
-                <div class="lg:col-span-1">
-                    <NuxtLink to="/" class="mb-4 flex items-center gap-2 text-xl font-bold text-white">
-                        <span class="flex h-9 w-9 items-center justify-center text-sm font-bold text-white"
-                            style="border-radius: var(--radius); background: var(--color-primary)">
-                            {{ site.name.charAt(0) }}
-                        </span>
-                        {{ site.name }}
-                    </NuxtLink>
-                    <p class="mt-4 text-sm leading-relaxed text-secondary-400">
-                        {{ site.seo.defaultDescription }}
-                    </p>
-                </div>
+  <footer class="bg-ink text-white/70">
+    <div class="brand-rule" aria-hidden="true" />
 
-                <!-- Quick Links -->
-                <div>
-                    <h3 class="mb-4 text-sm font-semibold uppercase tracking-wider text-white">
-                        Quick Links
-                    </h3>
-                    <ul class="space-y-3" role="list">
-                        <li v-for="link in site.nav" :key="link.to">
-                            <NuxtLink :to="link.to"
-                                class="text-sm text-secondary-400 transition-colors hover:text-white">
-                                {{ link.label }}
-                            </NuxtLink>
-                        </li>
-                    </ul>
-                </div>
+    <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+      <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+        <!-- Brand -->
+        <div>
+          <a href="#top" class="inline-block rounded-2xl bg-white p-3" aria-label="Back to top">
+            <img
+              :src="site.logo"
+              :alt="`${site.name} logo`"
+              width="400"
+              height="351"
+              loading="lazy"
+              class="h-20 w-auto"
+            />
+          </a>
+          <p class="mt-5 max-w-sm text-sm leading-relaxed">
+            A special school and child development centre in Sector 24, Rohini —
+            special education, therapy and early intervention for children with
+            special needs.
+          </p>
+          <p class="mt-4 font-display font-bold text-white">{{ site.motto }}</p>
 
-                <!-- Legal -->
-                <div>
-                    <h3 class="mb-4 text-sm font-semibold uppercase tracking-wider text-white">
-                        Legal
-                    </h3>
-                    <ul class="space-y-3" role="list">
-                        <li v-for="link in legalLinks" :key="link.to">
-                            <NuxtLink :to="link.to"
-                                class="text-sm text-secondary-400 transition-colors hover:text-white">
-                                {{ link.label }}
-                            </NuxtLink>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Contact Info -->
-                <div>
-                    <h3 class="mb-4 text-sm font-semibold uppercase tracking-wider text-white">
-                        Contact
-                    </h3>
-                    <ul class="space-y-3 text-sm text-secondary-400" role="list">
-                        <li class="flex items-start gap-2">
-                            <Icon name="ph:map-pin-duotone" class="mt-0.5 h-4 w-4 shrink-0"
-                                style="color: var(--color-primary)" />
-                            {{ site.address }}
-                        </li>
-                        <li>
-                            <a :href="`tel:${site.phone}`"
-                                class="flex items-center gap-2 transition-colors hover:text-white">
-                                <Icon name="ph:phone-duotone" class="h-4 w-4 shrink-0"
-                                    style="color: var(--color-primary)" />
-                                {{ site.phone }}
-                            </a>
-                        </li>
-                        <li>
-                            <a :href="`mailto:${site.email}`"
-                                class="flex items-center gap-2 transition-colors hover:text-white">
-                                <Icon name="ph:envelope-duotone" class="h-4 w-4 shrink-0"
-                                    style="color: var(--color-primary)" />
-                                {{ site.email }}
-                            </a>
-                        </li>
-                    </ul>
-
-                    <!-- Social Icons -->
-                    <div class="mt-6 flex gap-3">
-                        <a v-if="site.social.facebook" :href="site.social.facebook" target="_blank"
-                            rel="noopener noreferrer"
-                            class="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary-800 text-secondary-400 transition-colors hover:text-white"
-                            aria-label="Facebook">
-                            <Icon name="mdi:facebook" class="h-4 w-4" />
-                        </a>
-                        <a v-if="site.social.twitter" :href="site.social.twitter" target="_blank"
-                            rel="noopener noreferrer"
-                            class="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary-800 text-secondary-400 transition-colors hover:text-white"
-                            aria-label="Twitter / X">
-                            <Icon name="ri:twitter-x-fill" class="h-4 w-4" />
-                        </a>
-                        <a v-if="site.social.instagram" :href="site.social.instagram" target="_blank"
-                            rel="noopener noreferrer"
-                            class="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary-800 text-secondary-400 transition-colors hover:text-white"
-                            aria-label="Instagram">
-                            <Icon name="mdi:instagram" class="h-4 w-4" />
-                        </a>
-                        <a v-if="site.social.linkedin" :href="site.social.linkedin" target="_blank"
-                            rel="noopener noreferrer"
-                            class="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary-800 text-secondary-400 transition-colors hover:text-white"
-                            aria-label="LinkedIn">
-                            <Icon name="mdi:linkedin" class="h-4 w-4" />
-                        </a>
-                        <a v-if="site.social.github" :href="site.social.github" target="_blank"
-                            rel="noopener noreferrer"
-                            class="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary-800 text-secondary-400 transition-colors hover:text-white"
-                            aria-label="GitHub">
-                            <Icon name="mdi:github" class="h-4 w-4" />
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Bottom Bar -->
-            <div class="mt-12 border-t border-secondary-800 pt-8 text-center text-sm text-secondary-500">
-                <p>&copy; {{ currentYear }} {{ site.name }}. All rights reserved.</p>
-            </div>
+          <ul class="mt-6 flex gap-2.5" role="list">
+            <li v-for="s in socials" :key="s.key">
+              <a
+                :href="s.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-accent-500"
+                :aria-label="`${site.shortName} on ${s.label}`"
+              >
+                <Icon :name="s.icon" class="h-5 w-5" aria-hidden="true" />
+              </a>
+            </li>
+          </ul>
         </div>
-    </footer>
+
+        <!-- Link columns -->
+        <div v-for="col in footerColumns" :key="col.title">
+          <h2 class="mb-4 font-display text-sm font-bold uppercase tracking-wider text-white">
+            {{ col.title }}
+          </h2>
+          <ul class="space-y-1" role="list">
+            <li v-for="link in col.links" :key="link.label">
+              <NuxtLink
+                v-if="link.to.startsWith('/')"
+                :to="link.to"
+                class="inline-flex min-h-[32px] items-center py-1 text-sm transition-colors hover:text-white"
+              >
+                {{ link.label }}
+              </NuxtLink>
+              <a v-else :href="link.to" class="inline-flex min-h-[32px] items-center py-1 text-sm transition-colors hover:text-white">
+                {{ link.label }}
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Contact row -->
+      <div class="mt-12 grid gap-5 border-t border-white/10 pt-8 sm:grid-cols-3">
+        <p class="flex items-start gap-2.5 text-sm">
+          <Icon name="ph:map-pin-fill" class="mt-0.5 h-4 w-4 shrink-0 text-brand-yellow" aria-hidden="true" />
+          {{ site.address }}
+        </p>
+        <a
+          :href="`tel:+${site.phoneRaw}`"
+          class="flex items-start gap-2.5 text-sm transition-colors hover:text-white"
+        >
+          <Icon name="ph:phone-fill" class="mt-0.5 h-4 w-4 shrink-0 text-brand-yellow" aria-hidden="true" />
+          {{ site.phone }}
+        </a>
+        <a
+          :href="`mailto:${site.email}`"
+          class="flex items-start gap-2.5 break-all text-sm transition-colors hover:text-white"
+        >
+          <Icon name="ph:envelope-fill" class="mt-0.5 h-4 w-4 shrink-0 text-brand-yellow" aria-hidden="true" />
+          {{ site.email }}
+        </a>
+      </div>
+
+      <div
+        class="mt-8 flex flex-col items-center gap-1.5 border-t border-white/10 pt-7 text-center text-sm text-white/50"
+      >
+        <p>&copy; {{ year }} {{ site.name }}. All rights reserved.</p>
+        <p>{{ site.parentOrg }}</p>
+      </div>
+    </div>
+  </footer>
 </template>

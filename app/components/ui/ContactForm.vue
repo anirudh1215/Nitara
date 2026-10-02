@@ -1,119 +1,230 @@
 <script setup lang="ts">
 /**
- * ContactForm — Accessible contact form with client-side validation.
+ * ContactForm — Accessible enquiry form for parents.
+ * Posts to /api/enquiry. If forwarding is not configured on the server,
+ * the visitor is shown the phone / WhatsApp fallback rather than a
+ * message that quietly goes nowhere.
  */
-const site = useSite();
+import { site } from "~~/content";
 
 const form = reactive({
-    name: "",
+    parentName: "",
+    phone: "",
     email: "",
+    childAge: "",
+    concern: "",
     message: "",
+    /** Honeypot — hidden from real users */
+    website: "",
 });
 
-const submitted = ref(false);
+type Status = "idle" | "sending" | "sent" | "unavailable" | "error";
+const status = ref<Status>("idle");
 const errors = reactive<Record<string, string>>({});
 
+const concerns = [
+    "Not sure yet / general enquiry",
+    "Speech or language delay",
+    "Autism spectrum",
+    "ADHD or attention difficulties",
+    "Delayed milestones",
+    "Learning difficulty at school",
+    "Behaviour concerns",
+    "Physical / motor difficulties",
+    "Other",
+];
+
 function validate(): boolean {
-    // Reset
-    errors.name = "";
-    errors.email = "";
-    errors.message = "";
+    Object.keys(errors).forEach((k) => delete errors[k]);
 
-    let valid = true;
+    if (!form.parentName.trim()) errors.parentName = "Please tell us your name.";
 
-    if (!form.name.trim()) {
-        errors.name = "Name is required.";
-        valid = false;
+    if (!form.phone.trim()) {
+        errors.phone = "A phone number helps us call you back.";
+    } else if (!/^[+\d][\d\s-]{7,16}$/.test(form.phone.trim())) {
+        errors.phone = "Please enter a valid phone number.";
     }
 
-    if (!form.email.trim()) {
-        errors.email = "Email is required.";
-        valid = false;
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+    if (form.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
         errors.email = "Please enter a valid email address.";
-        valid = false;
     }
 
     if (!form.message.trim()) {
-        errors.message = "Message is required.";
-        valid = false;
+        errors.message = "Please tell us a little about your child.";
     }
 
-    return valid;
+    return Object.keys(errors).length === 0;
 }
 
-function handleSubmit() {
+async function handleSubmit() {
     if (!validate()) return;
 
-    // In production, replace with API call (e.g., /api/contact)
-    console.log("Form submitted:", { ...form });
-    submitted.value = true;
+    status.value = "sending";
 
-    // Reset form
-    form.name = "";
-    form.email = "";
-    form.message = "";
+    try {
+        await $fetch("/api/enquiry", { method: "POST", body: { ...form } });
+        status.value = "sent";
+        Object.assign(form, {
+            parentName: "",
+            phone: "",
+            email: "",
+            childAge: "",
+            concern: "",
+            message: "",
+            website: "",
+        });
+    } catch (err: unknown) {
+        const e = err as { statusCode?: number; data?: { data?: { errors?: Record<string, string> } } };
+
+        if (e?.statusCode === 422 && e.data?.data?.errors) {
+            Object.assign(errors, e.data.data.errors);
+            status.value = "idle";
+        } else if (e?.statusCode === 501) {
+            // Server has no forwarding destination configured yet.
+            status.value = "unavailable";
+        } else {
+            status.value = "error";
+        }
+    }
 }
+
+/** Shared input styling */
+const fieldClass =
+    "w-full rounded-2xl border-2 border-black/10 bg-cream px-4 py-3 font-semibold text-ink placeholder-ink-muted/60 transition-colors focus:border-primary-400 focus:bg-white focus:outline-none";
 </script>
 
 <template>
-    <form @submit.prevent="handleSubmit" class="mx-auto max-w-xl space-y-6" novalidate>
-        <!-- Success message -->
-        <div v-if="submitted" class="rounded-xl bg-green-50 border border-green-200 p-4 text-center text-green-700"
-            role="alert">
-            <p class="font-semibold">Thank you!</p>
-            <p class="text-sm">We'll get back to you at {{ site.email }}.</p>
+    <form class="space-y-5" novalidate @submit.prevent="handleSubmit">
+        <!-- Success -->
+        <div v-if="status === 'sent'" class="rounded-2xl border border-green-200 bg-green-50 p-5 text-green-800"
+            role="status">
+            <p class="flex items-center gap-2 font-bold">
+                <Icon name="ph:check-circle-fill" class="h-5 w-5" aria-hidden="true" />
+                Thank you — we have your message.
+            </p>
+            <p class="mt-1 text-sm">
+                Someone from {{ site.shortName }} will call you back. If it is urgent, please ring
+                <a :href="`tel:+${site.phoneRaw}`" class="font-semibold underline">{{ site.phone }}</a>.
+            </p>
         </div>
 
-        <!-- Name -->
-        <div>
-            <label for="contact-name" class="mb-1.5 block text-sm font-medium" style="color: var(--color-text)">
-                Full Name
-            </label>
-            <input id="contact-name" v-model="form.name" type="text" autocomplete="name" placeholder="Jane Doe"
-                class="w-full border border-secondary-300 px-4 py-2.5 placeholder-secondary-400 transition-colors focus:outline-none focus:ring-2"
-                :class="{ 'border-red-400': errors.name }" :style="{
-                    borderRadius: 'var(--radius)',
-                    color: 'var(--color-text)',
-                    '--tw-ring-color': 'var(--color-primary)',
-                }" />
-            <p v-if="errors.name" class="mt-1 text-sm text-red-500">{{ errors.name }}</p>
+        <!-- Forwarding not configured / network failure -->
+        <div v-else-if="status === 'unavailable' || status === 'error'"
+            class="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-amber-900" role="alert">
+            <p class="flex items-center gap-2 font-bold">
+                <Icon name="ph:warning-circle-fill" class="h-5 w-5" aria-hidden="true" />
+                We couldn't send that just now.
+            </p>
+            <p class="mt-1 text-sm">
+                Please call or WhatsApp us instead — we would rather hear from you directly than
+                have your message go missing.
+            </p>
+            <div class="mt-4 flex flex-col gap-2 sm:flex-row">
+                <UiAppButton :href="`tel:+${site.phoneRaw}`" size="sm">
+                    <Icon name="ph:phone-call-fill" class="h-4 w-4" aria-hidden="true" />
+                    {{ site.phone }}
+                </UiAppButton>
+                <UiAppButton v-if="site.whatsapp" :href="site.whatsapp" size="sm" variant="outline">
+                    <Icon name="mdi:whatsapp" class="h-4 w-4" aria-hidden="true" />
+                    WhatsApp
+                </UiAppButton>
+            </div>
         </div>
 
-        <!-- Email -->
-        <div>
-            <label for="contact-email" class="mb-1.5 block text-sm font-medium" style="color: var(--color-text)">
-                Email Address
-            </label>
-            <input id="contact-email" v-model="form.email" type="email" autocomplete="email"
-                placeholder="jane@example.com"
-                class="w-full border border-secondary-300 px-4 py-2.5 placeholder-secondary-400 transition-colors focus:outline-none focus:ring-2"
-                :class="{ 'border-red-400': errors.email }" :style="{
-                    borderRadius: 'var(--radius)',
-                    color: 'var(--color-text)',
-                    '--tw-ring-color': 'var(--color-primary)',
-                }" />
-            <p v-if="errors.email" class="mt-1 text-sm text-red-500">{{ errors.email }}</p>
-        </div>
+        <template v-if="status !== 'sent'">
+            <!-- Honeypot (hidden from users, catches bots) -->
+            <div class="absolute left-[-9999px]" aria-hidden="true">
+                <label for="website">Leave this field empty</label>
+                <input id="website" v-model="form.website" type="text" tabindex="-1" autocomplete="off" />
+            </div>
 
-        <!-- Message -->
-        <div>
-            <label for="contact-message" class="mb-1.5 block text-sm font-medium" style="color: var(--color-text)">
-                Message
-            </label>
-            <textarea id="contact-message" v-model="form.message" rows="5" placeholder="Tell us about your project..."
-                class="w-full resize-none border border-secondary-300 px-4 py-2.5 placeholder-secondary-400 transition-colors focus:outline-none focus:ring-2"
-                :class="{ 'border-red-400': errors.message }" :style="{
-                    borderRadius: 'var(--radius)',
-                    color: 'var(--color-text)',
-                    '--tw-ring-color': 'var(--color-primary)',
-                }" />
-            <p v-if="errors.message" class="mt-1 text-sm text-red-500">{{ errors.message }}</p>
-        </div>
+            <div class="grid gap-5 sm:grid-cols-2">
+                <!-- Parent name -->
+                <div>
+                    <label for="parentName" class="mb-1.5 block text-sm font-bold text-ink">
+                        Your name <span class="text-accent-700">*</span>
+                    </label>
+                    <input id="parentName" v-model="form.parentName" type="text" autocomplete="name"
+                        placeholder="Parent / guardian name" :class="[fieldClass, errors.parentName && 'border-red-400']"
+                        :aria-invalid="!!errors.parentName"
+                        :aria-describedby="errors.parentName ? 'err-parentName' : undefined" />
+                    <p v-if="errors.parentName" id="err-parentName" class="mt-1 text-sm text-red-600">
+                        {{ errors.parentName }}
+                    </p>
+                </div>
 
-        <!-- Submit -->
-        <UiAppButton type="submit" size="lg" class="w-full">
-            Send Message
-        </UiAppButton>
+                <!-- Phone -->
+                <div>
+                    <label for="phone" class="mb-1.5 block text-sm font-bold text-ink">
+                        Phone number <span class="text-accent-700">*</span>
+                    </label>
+                    <input id="phone" v-model="form.phone" type="tel" autocomplete="tel" inputmode="tel"
+                        placeholder="10-digit mobile number" :class="[fieldClass, errors.phone && 'border-red-400']"
+                        :aria-invalid="!!errors.phone"
+                        :aria-describedby="errors.phone ? 'err-phone' : undefined" />
+                    <p v-if="errors.phone" id="err-phone" class="mt-1 text-sm text-red-600">
+                        {{ errors.phone }}
+                    </p>
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label for="email" class="mb-1.5 block text-sm font-bold text-ink">
+                        Email <span class="font-normal text-ink-muted">(optional)</span>
+                    </label>
+                    <input id="email" v-model="form.email" type="email" autocomplete="email"
+                        placeholder="you@example.com" :class="[fieldClass, errors.email && 'border-red-400']"
+                        :aria-invalid="!!errors.email"
+                        :aria-describedby="errors.email ? 'err-email' : undefined" />
+                    <p v-if="errors.email" id="err-email" class="mt-1 text-sm text-red-600">
+                        {{ errors.email }}
+                    </p>
+                </div>
+
+                <!-- Child's age -->
+                <div>
+                    <label for="childAge" class="mb-1.5 block text-sm font-bold text-ink">
+                        Child's age <span class="font-normal text-ink-muted">(optional)</span>
+                    </label>
+                    <input id="childAge" v-model="form.childAge" type="text" placeholder="e.g. 4 years 6 months"
+                        :class="fieldClass" />
+                </div>
+            </div>
+
+            <!-- Concern -->
+            <div>
+                <label for="concern" class="mb-1.5 block text-sm font-bold text-ink">
+                    What brings you to us?
+                </label>
+                <select id="concern" v-model="form.concern" :class="fieldClass">
+                    <option value="">Select one…</option>
+                    <option v-for="c in concerns" :key="c" :value="c">{{ c }}</option>
+                </select>
+            </div>
+
+            <!-- Message -->
+            <div>
+                <label for="message" class="mb-1.5 block text-sm font-bold text-ink">
+                    Tell us about your child <span class="text-accent-700">*</span>
+                </label>
+                <textarea id="message" v-model="form.message" rows="5"
+                    placeholder="What have you noticed? Has your child been assessed before? Anything you would like us to know."
+                    :class="[fieldClass, 'resize-none', errors.message && 'border-red-400']"
+                    :aria-invalid="!!errors.message"
+                    :aria-describedby="errors.message ? 'err-message' : undefined" />
+                <p v-if="errors.message" id="err-message" class="mt-1 text-sm text-red-600">
+                    {{ errors.message }}
+                </p>
+            </div>
+
+            <UiAppButton type="submit" size="lg" class="w-full" :disabled="status === 'sending'">
+                {{ status === "sending" ? "Sending…" : "Send Enquiry" }}
+            </UiAppButton>
+
+            <p class="text-center text-sm text-ink-muted">
+                We treat everything you share about your child as confidential.
+                See our <NuxtLink to="/privacy-policy" class="underline">privacy policy</NuxtLink>.
+            </p>
+        </template>
     </form>
 </template>

@@ -1,99 +1,105 @@
 <script setup lang="ts">
-/**
- * Privacy Policy Page
- */
-const site = useSite();
+import { site } from "~~/content";
 
-useSEO({
-    title: "Privacy Policy",
-    description: `Privacy Policy for ${site.name}. Learn how we collect, use, and protect your information.`,
-    canonicalPath: "/privacy-policy",
+useHead({
+  title: `Privacy Policy — ${site.name}`,
+  meta: [
+    {
+      name: "description",
+      content: `How ${site.name} collects, uses and protects information about children and families.`,
+    },
+    { name: "robots", content: "noindex, follow" },
+  ],
 });
 </script>
 
 <template>
-    <div>
-        <!-- Page Header -->
-        <section class="bg-secondary-50 px-4 py-16 sm:px-6 lg:px-8">
-            <div class="mx-auto max-w-4xl text-center">
-                <h1 class="text-4xl font-extrabold md:text-5xl" style="color: var(--color-text)">
-                    Privacy Policy
-                </h1>
-                <p class="mt-4" style="color: var(--color-text-muted)">
-                    Last updated: {{ new Date().toLocaleDateString('en-US', {
-                        month: 'long', day: 'numeric', year:
-                    'numeric' }) }}
-                </p>
-            </div>
-        </section>
+  <article class="bg-cream px-4 pb-24 pt-32 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-3xl">
+      <h1 class="text-4xl text-ink sm:text-5xl">Privacy Policy</h1>
+      <div class="brand-rule mt-6 w-24" aria-hidden="true" />
 
-        <!-- Content -->
-        <UiSectionWrapper>
-            <article class="mx-auto max-w-3xl">
-                <section class="mb-10">
-                    <h2 class="text-2xl font-bold" style="color: var(--color-text)">1. Information We Collect</h2>
-                    <p class="mt-4 leading-relaxed" style="color: var(--color-text-muted)">
-                        {{ site.name }} ("we", "our", or "us") collects information you provide directly to us, such as
-                        when you fill out a contact form, subscribe to our newsletter, or communicate with us. This may
-                        include your name, email address, phone number, and any message content you provide.
-                    </p>
-                </section>
+      <div class="mt-10 space-y-6 text-lg leading-relaxed text-ink-muted">
+        <p class="rounded-2xl bg-butter p-5 text-base text-ink">
+          <strong>Note for the site owner:</strong> this is a starting draft, not
+          legal advice. Information about children with disabilities is sensitive
+          personal data under India's Digital Personal Data Protection Act, 2023.
+          Have this page reviewed by a lawyer and replace this notice before the
+          site goes live.
+        </p>
 
-                <section class="mb-10">
-                    <h2 class="text-2xl font-bold" style="color: var(--color-text)">2. How We Use Your Information</h2>
-                    <p class="mt-4 leading-relaxed" style="color: var(--color-text-muted)">
-                        We use the information we collect to respond to your inquiries, provide our services, improve
-                        our website, send you marketing communications (with your consent), and comply with legal
-                        obligations.
-                    </p>
-                </section>
+        <h2 class="pt-4 text-2xl text-ink">What we collect</h2>
+        <p>
+          When you contact us through this website we collect the name and phone
+          number you give us, your email address if you provide one, and whatever
+          you choose to tell us about your child — which may include their age and
+          the difficulties you have noticed.
+        </p>
 
-                <section class="mb-10">
-                    <h2 class="text-2xl font-bold" style="color: var(--color-text)">3. Information Sharing</h2>
-                    <p class="mt-4 leading-relaxed" style="color: var(--color-text-muted)">
-                        We do not sell, trade, or otherwise transfer your personal information to third parties without
-                        your consent, except as necessary to provide our services, comply with law, or protect our
-                        rights.
-                    </p>
-                </section>
+        <h2 class="pt-4 text-2xl text-ink">Why we collect it</h2>
+        <p>
+          Solely to respond to your enquiry, arrange an assessment or visit, and —
+          if your child enrols — to plan and deliver their programme. We do not sell
+          your information, and we do not use it for advertising.
+        </p>
 
-                <section class="mb-10">
-                    <h2 class="text-2xl font-bold" style="color: var(--color-text)">4. Data Security</h2>
-                    <p class="mt-4 leading-relaxed" style="color: var(--color-text-muted)">
-                        We implement appropriate technical and organizational measures to protect your personal
-                        information against unauthorized access, alteration, disclosure, or destruction.
-                    </p>
-                </section>
+        <h2 class="pt-4 text-2xl text-ink">Who can see it</h2>
+        <p>
+          Enquiries are seen by the staff at {{ site.name }} who need to act on
+          them. Clinical and educational records are kept confidential within the
+          team working with your child. We share information outside the centre only
+          with your consent, or where the law requires it — for example, a
+          safeguarding obligation.
+        </p>
 
-                <section class="mb-10">
-                    <h2 class="text-2xl font-bold" style="color: var(--color-text)">5. Cookies</h2>
-                    <p class="mt-4 leading-relaxed" style="color: var(--color-text-muted)">
-                        Our website may use cookies to enhance your browsing experience. You can choose to disable
-                        cookies through your browser settings, though this may affect certain features of our website.
-                    </p>
-                </section>
+        <h2 class="pt-4 text-2xl text-ink">How long we keep it</h2>
+        <p>
+          Enquiries that do not lead to enrolment are deleted once they are no longer
+          needed. Records for enrolled children are retained for as long as we are
+          required to keep them.
+        </p>
 
-                <section class="mb-10">
-                    <h2 class="text-2xl font-bold" style="color: var(--color-text)">6. Your Rights</h2>
-                    <p class="mt-4 leading-relaxed" style="color: var(--color-text-muted)">
-                        You have the right to access, correct, or delete your personal data. To exercise these rights,
-                        please contact us at
-                        <a :href="`mailto:${site.email}`" class="hover:underline" style="color: var(--color-primary)">{{
-                            site.email }}</a>.
-                    </p>
-                </section>
+        <h2 class="pt-4 text-2xl text-ink">Your rights</h2>
+        <p>
+          You can ask us what information we hold about you or your child, ask for it
+          to be corrected, or ask us to delete it. Write to
+          <a :href="`mailto:${site.email}`" class="font-bold text-primary-700 underline">
+            {{ site.email }}</a>
+          or call {{ site.phone }}.
+        </p>
 
-                <section>
-                    <h2 class="text-2xl font-bold" style="color: var(--color-text)">7. Contact Us</h2>
-                    <p class="mt-4 leading-relaxed" style="color: var(--color-text-muted)">
-                        If you have any questions about this Privacy Policy, please contact us at
-                        <a :href="`mailto:${site.email}`" class="hover:underline" style="color: var(--color-primary)">{{
-                            site.email }}</a>
-                        or visit our <NuxtLink to="/contact" class="hover:underline"
-                            style="color: var(--color-primary)">contact page</NuxtLink>.
-                    </p>
-                </section>
-            </article>
-        </UiSectionWrapper>
+        <h2 class="pt-4 text-2xl text-ink">Photographs</h2>
+        <p>
+          We do not publish photographs or videos of any child without separate,
+          specific written consent from a parent or guardian, and that consent can be
+          withdrawn at any time.
+        </p>
+
+        <h2 class="pt-4 text-2xl text-ink">This website</h2>
+        <p>
+          This site does not use advertising or analytics cookies. Fonts and some
+          images are loaded from Google Fonts and Unsplash, which will see your IP
+          address as part of serving those files. The map on the contact section is
+          embedded from Google Maps.
+        </p>
+
+        <h2 class="pt-4 text-2xl text-ink">Contact</h2>
+        <p>
+          {{ site.name }}<br />
+          {{ site.address }}<br />
+          {{ site.phone }} ·
+          <a :href="`mailto:${site.email}`" class="font-bold text-primary-700 underline">
+            {{ site.email }}</a>
+        </p>
+      </div>
+
+      <NuxtLink
+        to="/"
+        class="mt-12 inline-flex items-center gap-2 font-bold text-primary-700 hover:text-accent-700"
+      >
+        <Icon name="ph:arrow-left-bold" class="h-4 w-4" aria-hidden="true" />
+        Back to home
+      </NuxtLink>
     </div>
+  </article>
 </template>

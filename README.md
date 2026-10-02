@@ -1,131 +1,267 @@
-# Nuxt 4 Business Portfolio — Starter Template
+# Nitara Special School & Child Development Center
 
-A production-ready, SEO-optimized Nuxt 4 starter template for business portfolio websites. Fully config-driven — customize your brand, services, and content from a single file.
+One-page website for **Nitara Special School & Child Development Center**
+(*A Unit of Sahaj Sambhav*) — Plot No. 110, Pocket 27, Sector 24, Rohini,
+New Delhi.
 
-## ✨ Features
+Built with **Nuxt 4**, **Tailwind CSS** and **Motion for Vue** (`motion-v`).
 
-- **Nuxt 4** with SSR enabled
-- **TypeScript** + `<script setup>` Composition API
-- **Tailwind CSS** with a clean, customizable color palette
-- **File-based routing** — 6 pages included
-- **Config-driven** — all brand & content data in `/config/site.ts`
-- **SEO-ready** — `useHead()`, `useSeoMeta()`, OpenGraph, Twitter Cards, JSON-LD
-- **Responsive** — mobile-first design with sticky header & hamburger menu
-- **Performance** — code splitting, lazy scroll animations, compressed assets
-- **Accessible** — semantic HTML5, ARIA labels, focus states
+---
 
-## 📁 Folder Structure
+## ⚠️ Before this goes live
 
-```
-├── app/
-│   ├── assets/css/main.css        # Global CSS & Tailwind config
-│   ├── components/
-│   │   ├── layout/
-│   │   │   ├── AppHeader.vue      # Sticky responsive navbar
-│   │   │   └── AppFooter.vue      # Multi-column footer
-│   │   └── ui/
-│   │       ├── AppButton.vue      # Reusable button / link
-│   │       ├── SectionWrapper.vue # Section layout container
-│   │       ├── ServiceCard.vue    # Service offering card
-│   │       ├── TestimonialCard.vue# Client testimonial card
-│   │       └── ContactForm.vue    # Contact form with validation
-│   ├── composables/
-│   │   ├── useSEO.ts              # Config-driven SEO helper
-│   │   └── useScrollAnimation.ts  # Intersection Observer composable
-│   ├── layouts/
-│   │   └── default.vue            # Header + content + footer
-│   ├── pages/
-│   │   ├── index.vue              # Home page
-│   │   ├── about.vue              # About page
-│   │   ├── services.vue           # Services page
-│   │   ├── contact.vue            # Contact page
-│   │   ├── privacy-policy.vue     # Privacy policy
-│   │   └── terms.vue              # Terms & conditions
-│   └── app.vue                    # Root component
-├── config/
-│   └── site.ts                    # ⭐ Central brand & content config
-├── public/
-│   ├── favicon.svg
-│   └── logo.svg
-├── nuxt.config.ts
-├── tailwind.config.ts
-└── package.json
-```
+The site is complete and deployable, but some content is placeholder. Search
+the codebase for `TODO:` — every item is flagged in `content.ts`.
 
-## 🚀 Quick Start
+| # | Item | Where |
+|---|------|-------|
+| 1 | **Email address** — currently `info@nitaraspecialschool.com`, a guess | `content.ts` → `site.email` |
+| 2 | **Domain** — currently `nitaraspecialschool.com`, a guess. Also update `public/robots.txt` | `content.ts` → `site.url` |
+| 3 | **PIN code** — `110085` assumed for Sector 24, Rohini. Please confirm | `content.ts` → `site.address` |
+| 4 | **Team members** — four invented placeholder people with placeholder portraits | `content.ts` → `team` |
+| 5 | **Parent reviews** — three clearly-labelled placeholder quotes. Replace with real, consented quotes or delete the section | `content.ts` → `testimonials` |
+| 6 | **Photographs** — stock images from Unsplash. Replace with photos of the actual centre | `content.ts` → `hero`, `story`, `programs[].image` |
+| 7 | **Credential claims** — the scrolling strip says "Qualified special educators". Verify against the team's actual registrations | `content.ts` → `marquee` |
+| 8 | **Staffing ratio** — the FAQ answer has a `TODO` where the real ratio should go | `content.ts` → `faqs` |
+| 9 | **Social links** — Facebook / Instagram / YouTube are empty (empty links are hidden automatically) | `content.ts` → `site.social` |
+| 10 | **Privacy policy & terms** — drafts only, not legal advice. Information about children with disabilities is sensitive personal data under the DPDP Act, 2023. Have a lawyer review both | `app/pages/privacy-policy.vue`, `app/pages/terms.vue` |
+| 11 | **Contact form destination** — set `NUXT_ENQUIRY_WEBHOOK` or the form will tell visitors to phone instead | see *Contact form* below |
+
+The three count-up figures (4 pathways / 6 services / 6 days) are deliberately
+limited to things that are simply true of the page as written. They are safe
+to publish, but the section is really meant for years of experience, staff
+numbers and sessions per week — swap them in once you have figures you can
+evidence.
+
+---
+
+## Quick start
 
 ```bash
-# Clone the template
-git clone <your-repo-url> my-business-site
-cd my-business-site
-
-# Install dependencies
-bun install        # or npm install / pnpm install
-
-# Start dev server
-bun run dev        # http://localhost:3000
-
-# Build for production
-bun run build
-
-# Preview production build
-bun run preview
+bun install       # or npm install
+bun run dev       # http://localhost:3000
 ```
 
-## ⚙️ Customization
+```bash
+bun run build     # production build into .output/
+bun run preview   # serve the built site locally
+```
 
-### 1. Brand & Content (`config/site.ts`)
+Requires Node 20+ (built on Node 24).
 
-All brand data is centralized in one config file:
+---
+
+## Editing the content
+
+**Almost everything lives in one file: [`content.ts`](./content.ts).**
+No component edits needed for day-to-day changes.
 
 ```ts
-export const siteConfig = {
-  name: "Your Business",
-  tagline: "Your catchy tagline here",
-  description: "Your meta description",
-  url: "https://yourdomain.com",
-  phone: "+1 (555) 000-0000",
-  email: "hello@yourdomain.com",
-  address: "123 Your Street, City, State ZIP",
-  primaryColor: "#2563eb",
-  social: { ... },
-  nav: [ ... ],
-  services: [ ... ],
-  testimonials: [ ... ],
-};
+export const site = { … }        // name, phone, email, address, hours, social, SEO
+export const nav = [ … ]         // header links (in-page anchors)
+export const hero = { … }        // headline, body, trust words, buttons, photo
+export const marquee = [ … ]     // the scrolling strip
+export const story = { … }       // "Our Story"
+export const programs = [ … ]    // the four programme cards
+export const routine = [ … ]     // the day's four time blocks
+export const team = [ … ]        // staff cards
+export const testimonials = [ … ]// parent quotes
+export const stats = [ … ]       // count-up figures
+export const faqs = [ … ]        // accordion
+export const ctaBanner = { … }   // closing call to action
+export const footerColumns = [ … ]
 ```
 
-### 2. Colors (`tailwind.config.ts`)
+### Colours
 
-The `primary` and `secondary` color palettes are defined in the Tailwind config. Swap the hex values to match your brand.
+Two palettes, deliberately separated:
 
-### 3. SEO (`nuxt.config.ts`)
+- **`brand`** — the logo colours exactly as drawn. Used only as *fills*:
+  icon tiles, decorative rules, carousel dots.
+- **`brandText`** — darkened versions of the same hues, used for anything
+  carrying *text*, and for solid pills with white text on them.
 
-Update the default meta tags, `titleTemplate`, OG image URL, and canonical URL in `nuxt.config.ts`. Per-page SEO is handled via the `useSEO()` composable.
+Every value in `brandText` clears WCAG AA (4.5:1) both as dark text on the
+cream background and as a background behind white text. The raw logo orange,
+green, pink and yellow do not — which matters on a site whose readers include
+families with visual impairments. Keep that split when adding content.
 
-### 4. Typography
+### Adding a programme or a team member
 
-The template uses [Inter](https://fonts.google.com/specimen/Inter) via Google Fonts. Change the font in `nuxt.config.ts` (head link) and `tailwind.config.ts` (fontFamily).
+Append an object to the array in `content.ts`. Give it both a `color` (from
+`brand`) and a `textColor` (from `brandText`). The carousel recalculates its
+own dots from the real scroll width, so nothing else needs touching.
 
-## 🔍 SEO Checklist
+---
 
-- [x] SSR-rendered meta tags
-- [x] Dynamic `<title>` per page with `titleTemplate`
-- [x] OpenGraph & Twitter Card meta
-- [x] Canonical URLs
-- [x] JSON-LD structured data (LocalBusiness on homepage)
-- [x] Semantic HTML5 (`<header>`, `<main>`, `<footer>`, `<section>`, `<article>`, `<nav>`)
-- [x] `lang="en"` on `<html>`
+## Contact form
 
-## 📦 Deployment
+The form posts to `POST /api/enquiry` ([`server/api/enquiry.post.ts`](./server/api/enquiry.post.ts)),
+which validates the submission (plus a honeypot field for bots) and forwards
+it as JSON to whatever URL is in `NUXT_ENQUIRY_WEBHOOK`.
 
-Works with any Nuxt-compatible hosting:
+```bash
+cp .env.example .env
+# then set NUXT_ENQUIRY_WEBHOOK to a Formspree / Zapier / Make / Apps Script URL
+```
 
-- **Vercel** — `npx vercel`
-- **Netlify** — connect your Git repo
-- **Cloudflare Pages** — zero-config deployment
-- **Node.js server** — `bun run build && node .output/server/index.mjs`
+Payload:
 
-## 📄 License
+```json
+{ "parentName": "…", "phone": "…", "email": "…", "childAge": "…",
+  "concern": "…", "message": "…", "receivedAt": "…", "source": "nitara-website-contact-form" }
+```
 
-MIT — free for personal and commercial use.
+**If the variable is not set**, the endpoint returns `501` and the form shows
+the phone and WhatsApp buttons instead. It never silently swallows a parent's
+message.
+
+---
+
+## Deploying to Vercel
+
+Vercel detects Nuxt automatically — no `vercel.json` needed.
+
+### Option A — Git (recommended)
+
+1. Push this repo to GitHub/GitLab/Bitbucket.
+2. In Vercel: **Add New → Project**, import the repo.
+3. Framework preset is detected as **Nuxt.js**. Leave Build Command
+   (`nuxt build`) and Output Directory at their defaults.
+4. **Settings → Environment Variables**, add for *Production* and *Preview*:
+   - `NUXT_ENQUIRY_WEBHOOK` — your form destination URL
+5. **Deploy.** Every push to `main` redeploys; branches get preview URLs.
+
+### Option B — CLI
+
+```bash
+npm i -g vercel
+vercel login
+vercel          # preview deployment
+vercel --prod   # production
+```
+
+Set the env var once with:
+
+```bash
+vercel env add NUXT_ENQUIRY_WEBHOOK production
+```
+
+### After the first deploy
+
+1. Add the custom domain under **Settings → Domains**.
+2. Update `site.url` in `content.ts` and the `Sitemap:` line in
+   `public/robots.txt` to the real domain, then redeploy — canonical URLs,
+   Open Graph tags and the sitemap all read from `site.url`.
+3. Submit `https://yourdomain.com/sitemap.xml` in Google Search Console.
+
+---
+
+## Measured results
+
+Lighthouse against the production build (`bun run build && bun run preview`),
+Chrome 140 headless:
+
+| | Performance | Accessibility | Best Practices | SEO |
+|---|---|---|---|---|
+| **Mobile** (slow 4G, 4× CPU throttle) | **92** | **100** | **100** | **100** |
+| **Desktop** | **100** | **100** | **100** | **100** |
+
+Mobile: FCP 2.3 s · LCP 2.9 s · TBT 20 ms · CLS 0.
+
+Numbers will differ on Vercel — its CDN and HTTP/2 generally help, while the
+remote Unsplash images are the main variable. They move once you swap in your
+own photos.
+
+What the scores cost, in case you change these:
+
+- Fonts are **self-hosted** by `@nuxt/fonts`. The render-blocking request to
+  `fonts.googleapis.com` was worth ~860 ms of First Contentful Paint.
+- Icons are **bundled locally** via `@iconify-json/ph` and `@iconify-json/mdi`,
+  so no runtime call to the Iconify API.
+- There is deliberately **no `@nuxt/image`**. Every photo already comes from a
+  CDN that resizes and format-negotiates (`SmartImage.vue` builds the srcset),
+  so adding IPX would only ship a ~30 MB `sharp` binary tied to one CPU
+  architecture — which also crashed the prerender step.
+- The hero photo is **preloaded** with a matching `imagesrcset`, since it is
+  the LCP element.
+
+---
+
+## Accessibility
+
+Verified with Lighthouse/axe plus a scripted keyboard and screen-reader-shape
+pass:
+
+- Skip link is the first tab stop; `<main>`, `<header>`, `<footer>` landmarks;
+  exactly one `<h1>`.
+- FAQ accordion: real `<button>`s with `aria-expanded` / `aria-controls`,
+  and Arrow/Home/End roving focus between questions.
+- Carousels: native scroll-snap (so swipe and keyboard scrolling work with no
+  JS), plus labelled arrow and dot buttons. Dot count is derived from the
+  actual number of reachable scroll positions.
+- Mobile menu: `aria-expanded`, body-scroll lock, closes on `Escape`.
+- Marquee: the duplicated copy that makes the loop seamless is `aria-hidden`,
+  so each phrase is announced once. Pauses on hover and on keyboard focus.
+- Every image has `alt` text describing what is actually in the picture.
+- Touch targets are ≥44 px with ≥8 px spacing.
+- **`prefers-reduced-motion`** is honoured two ways: components read it in JS
+  and render the resting state, and a `!important` CSS rule pins
+  `[data-reveal]` elements to their resting state even before JS runs.
+
+---
+
+## Project structure
+
+```
+content.ts                      ← ALL content lives here
+nuxt.config.ts
+tailwind.config.ts
+.env.example
+app/
+  app.vue                       skip link + layout
+  layouts/default.vue
+  pages/
+    index.vue                   the one-pager (+ School & FAQPage JSON-LD)
+    privacy-policy.vue
+    terms.vue
+  components/
+    layout/   AppHeader.vue     sticky, scroll-aware, hamburger
+              AppFooter.vue
+    sections/ HeroSection.vue   TrustStrip.vue      StorySection.vue
+              ProgramsSection.vue  RoutineSection.vue  TeamSection.vue
+              TestimonialsSection.vue  StatsSection.vue  FaqSection.vue
+              CtaSection.vue    ContactSection.vue
+    ui/       Reveal.vue        the single scroll-entrance primitive
+              AppButton.vue  SectionHeading.vue  Marquee.vue
+              SmartImage.vue  ContactForm.vue
+  composables/
+    usePrefersReducedMotion.ts
+    useCarousel.ts              shared carousel logic
+  utils/motion.ts               every timing on the site, in one place
+server/api/enquiry.post.ts
+public/                         logo variants, favicons, OG image, robots.txt
+```
+
+### Motion
+
+All timings live in [`app/utils/motion.ts`](./app/utils/motion.ts) so the page
+shares one feel: a soft spring (`stiffness 110`, `damping 20`), 36 px of
+travel, 0.1 s stagger between siblings, fired once on entry.
+
+Scroll reveals go through `<UiReveal>`; the hero animates on load in sequence
+instead. One rule worth knowing if you edit these: `reduced` must only change
+the *values* passed to `<Motion>`, never which props are present — adding or
+removing `initial`/`animate` on a live Motion element throws
+`visualElement.getBaseTarget is not a function`.
+
+---
+
+## Credits
+
+Photographs are placeholders from [Unsplash](https://unsplash.com) and
+[placehold.co](https://placehold.co). Fonts are
+[Baloo 2](https://fonts.google.com/specimen/Baloo+2) and
+[Nunito](https://fonts.google.com/specimen/Nunito) (SIL Open Font License),
+self-hosted at build time. Icons are
+[Phosphor](https://phosphoricons.com) and [Material Design Icons](https://pictogrammers.com/library/mdi/).
